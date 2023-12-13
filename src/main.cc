@@ -1,10 +1,19 @@
 #include <iostream>
+#include <fstream>
 #include <cstdio>
 #include <string>
 
 #include "arguments.h"
 
 static const std::string templatePath = "~/.config/templater/templates/";
+
+bool fileExists(std::string path) {
+    std::ifstream file(path);
+
+    if(!file.is_open()) return false;
+
+    return true;
+}
 
 void printUsage(char* executablePath) {
     fprintf(stderr, "%s <project_name> <language>\n", executablePath);
@@ -41,6 +50,11 @@ int main(int argc, char **argv) {
 
     int result = system(copyTemplateFilesCommand.c_str());
     if(result != 0) return result;
+
+    if(fileExists(projectName + "/setup.sh")) {
+        std::string setupCommand = "sh " + projectName + "/setup.sh";
+        system(setupCommand.c_str());
+    }
 
     delete parser;
     return 0;
